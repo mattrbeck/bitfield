@@ -1,6 +1,6 @@
 # BitField - Fixed Length Bitfields in Crystal Lang
 
-[![Build Status](https://travis-ci.org/mattrberry/bitfield.svg?branch=master)](https://travis-ci.org/mattrberry/bitfield)
+[![Build Status](https://travis-ci.org/mattrbeck/bitfield.svg?branch=master)](https://travis-ci.org/mattrbeck/bitfield)
 
 
 The goal that BitField strives to accomplish is to allow for the creation of minimal-effort bitfields in Crystal. The intention is not intended to interop with C bitfields.
@@ -12,7 +12,7 @@ The goal that BitField strives to accomplish is to allow for the creation of min
    ```yaml
    dependencies:
      bitfield:
-       github: mattrberry/bitfield
+       github: mattrbeck/bitfield
    ```
 
 2. Run `shards install`
@@ -102,7 +102,7 @@ puts bf # => Test8(0xAF; three: 7, bool: true, four: 10)
 
 ## Contributing
 
-1. Fork it (<https://github.com/mattrberry/bitfield/fork>)
+1. Fork it (<https://github.com/mattrbeck/bitfield/fork>)
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
@@ -110,4 +110,4 @@ puts bf # => Test8(0xAF; three: 7, bool: true, four: 10)
 
 ## Contributors
 
-- [Matthew Berry](https://github.com/mattrberry) - creator and maintainer
+- [Matthew Beck](https://github.com/mattrbeck) - creator and maintainer
