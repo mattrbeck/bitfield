@@ -122,7 +122,7 @@ abstract class BitField(T)
       io << self.class
       io << "("
       io << "0x"
-      io << @value.to_s(16).rjust(sizeof(T) * 2, '0').upcase
+      @value.to_s(io, 16, precision: sizeof(T) * 2, upcase: true)
       io << "; "
       {% for field, idx in FIELDS %}
         {% name = field[0].id %}
