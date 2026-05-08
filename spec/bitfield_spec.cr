@@ -186,4 +186,18 @@ describe BitField do
     Test8.new(0xAB).to_s.should eq "Test8(0xAB; enum_field: B, bool: true, four: 10)"
     Test32.new(0x5F0000F5).to_s.should eq "Test32(0x5F0000F5; rest: 251658485, four: true, three: false, two: true, one: false)"
   end
+
+  it "works on large u64 bitfields with 32-bit and larger fields" do
+    bf = Test64.new(0_u64)
+    bf.first_32 = 0x12345678_u64
+    bf.rest_32 = 0xABCDEF01_u64
+    bf.first_32.should eq 0x12345678_u64
+    bf.rest_32.should eq 0xABCDEF01_u64
+    bf.value.should eq 0xABCDEF0112345678_u64
+  end
+end
+
+class Test64 < BitField(UInt64)
+  num first_32, 32
+  num rest_32, 32
 end

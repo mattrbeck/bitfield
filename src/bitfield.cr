@@ -109,11 +109,11 @@ abstract class BitField(T)
     SIZE = {{pos}}
 
     def value : T
-      @value & ~{{write_only_mask}}
+      @value & ~T.new({{write_only_mask}})
     end
 
     def value=(value : T)
-      @value = (@value & {{read_only_mask}}) | (value & ~{{read_only_mask}})
+      @value = (@value & T.new({{read_only_mask}})) | (value & ~T.new({{read_only_mask}}))
     end
   end
 
@@ -141,11 +141,11 @@ abstract class BitField(T)
   end
 
   macro set_val(dst, src, size, start)
-    ({{dst}} = {{dst}} & ~shifted_mask({{size}}, {{start}}) | ({{src}} & mask({{size}})) << {{start}})
+    ({{dst}} = {{dst}} & ~shifted_mask({{size}}, {{start}}) | (T.new({{src}}) & mask({{size}})) << {{start}})
   end
 
   macro mask(size)
-    ((1 << {{size}}) - 1)
+    (~T.new(0) >> (sizeof(T) * 8 - {{size}}))
   end
 
   macro shifted_mask(size, start)
