@@ -6,16 +6,26 @@ abstract class BitField(T)
   macro inherited
     {% raise "Cannot create a BitField from a non-integer" unless T <= Int %}
 
+    {% if T.id == "UInt8" || T.id == "Int8" %}
+      {% bit_size = 8 %}
+    {% elsif T.id == "UInt16" || T.id == "Int16" %}
+      {% bit_size = 16 %}
+    {% elsif T.id == "UInt32" || T.id == "Int32" %}
+      {% bit_size = 32 %}
+    {% elsif T.id == "UInt64" || T.id == "Int64" %}
+      {% bit_size = 64 %}
+    {% elsif T.id == "UInt128" || T.id == "Int128" %}
+      {% bit_size = 128 %}
+    {% else %}
+      {% raise "Unsupported integer type #{T}" %}
+    {% end %}
+
+
     FIELDS = [] of Tuple(String, Crystal::Macros::Path, Int32, Bool, Bool) # name, type, size, read_only, write_only (types don't actually matter here..)
 
     macro finished
-      build_methods
+      build_methods({{bit_size}})
       def_to_s
-
-      def initialize(@value : T)
-        bits = sizeof(T) * 8
-        raise "You must describe exactly #{bits} bits (#{SIZE} bits have been described)" unless SIZE == bits
-      end
 
       def_equals_and_hash @value
     end
@@ -58,7 +68,7 @@ abstract class BitField(T)
     {% FIELDS << {name, type, size, read_only, write_only} %}
   end
 
-  macro build_methods
+  macro build_methods(bit_size)
     {% pos = 0 %}
     {% read_only_mask = 0 %}
     {% write_only_mask = 0 %}
@@ -107,6 +117,13 @@ abstract class BitField(T)
     {% end %}
 
     SIZE = {{pos}}
+
+    {% if pos != bit_size %}
+      {% raise "You must describe exactly #{bit_size} bits (#{pos} bits have been described)" %}
+    {% end %}
+
+    def initialize(@value : T)
+    end
 
     def value : T
       @value & ~T.new({{write_only_mask}})

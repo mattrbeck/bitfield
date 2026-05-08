@@ -21,13 +21,6 @@ class Test32 < BitField(UInt32)
   bool one
 end
 
-class TestTooFew < BitField(UInt16)
-  num too_few, 15
-end
-
-class TestTooMany < BitField(UInt16)
-  num too_many, 17
-end
 
 class TestMethods < BitField(UInt8)
   num bits, 8
@@ -114,17 +107,6 @@ describe BitField do
     bf.value.should eq 0x5F0000F5
   end
 
-  it "raises exception on too few" do
-    expect_raises(Exception, "You must describe exactly 16 bits (15 bits have been described)") do
-      bf = TestTooFew.new 0x0000
-    end
-  end
-
-  it "raises exception on too many" do
-    expect_raises(Exception, "You must describe exactly 16 bits (17 bits have been described)") do
-      bf = TestTooMany.new 0x0000
-    end
-  end
 
   it "allows new method definitions" do
     bf = TestMethods.new 0b00000001
@@ -194,6 +176,48 @@ describe BitField do
     bf.first_32.should eq 0x12345678_u64
     bf.rest_32.should eq 0xABCDEF01_u64
     bf.value.should eq 0xABCDEF0112345678_u64
+  end
+
+  describe "Compile-time Validations" do
+    it "fails to compile when too few bits are described" do
+      code = <<-CRYSTAL
+        require "./src/bitfield"
+        class TestTooFew < BitField(UInt16)
+          num too_few, 15
+        end
+      CRYSTAL
+
+      File.write("temp_spec.cr", code)
+      begin
+        stderr = IO::Memory.new
+        result = Process.run("crystal", ["build", "--no-codegen", "temp_spec.cr"], error: stderr)
+        error_output = stderr.to_s
+        result.exit_code.should_not eq(0)
+        error_output.should contain("You must describe exactly 16 bits (15 bits have been described)")
+      ensure
+        File.delete("temp_spec.cr") if File.exists?("temp_spec.cr")
+      end
+    end
+
+    it "fails to compile when too many bits are described" do
+      code = <<-CRYSTAL
+        require "./src/bitfield"
+        class TestTooMany < BitField(UInt16)
+          num too_many, 17
+        end
+      CRYSTAL
+
+      File.write("temp_spec.cr", code)
+      begin
+        stderr = IO::Memory.new
+        result = Process.run("crystal", ["build", "--no-codegen", "temp_spec.cr"], error: stderr)
+        error_output = stderr.to_s
+        result.exit_code.should_not eq(0)
+        error_output.should contain("You must describe exactly 16 bits (17 bits have been described)")
+      ensure
+        File.delete("temp_spec.cr") if File.exists?("temp_spec.cr")
+      end
+    end
   end
 end
 
